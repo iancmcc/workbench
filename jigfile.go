@@ -10,6 +10,10 @@ type Jigfile struct {
 }
 
 type Build struct {
+	Pre    []string
+	Build  []string
+	Post   []string
+	Output []string
 }
 
 func ParseJigfile(r io.Reader) (*Jigfile, error) {
