@@ -3,6 +3,7 @@ package jig_test
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -122,12 +123,90 @@ var _ = Describe("Jigfile", func() {
 			file, _ = ioutil.TempFile("", "Jigfile")
 			file.WriteString(data)
 			file.Sync()
-			jf, err = ParseJigfileFromFile(file.Name())
+			jf, err = ParseJigfilePath(file.Name())
 		})
 		AfterEach(func() {
 			if file != nil {
 				syscall.Unlink(file.Name())
 				file = nil
+			}
+		})
+		It("should have the build by name", func() {
+			Expect(jf.Builds).To(HaveKey("ubuntu"))
+		})
+
+		Context("the build", func() {
+			BeforeEach(func() {
+				build = jf.Builds["ubuntu"]
+			})
+			It("should have a pre script", func() {
+				Expect(build.Pre).To(Equal(
+					[]string{"/bin/bash dependencies.sh"},
+				))
+			})
+			It("should have build commands", func() {
+				Expect(build.Build).To(Equal(
+					[]string{"configure", "make", "make install"},
+				))
+			})
+			It("should have post commands", func() {
+				Expect(build.Post).To(Equal(
+					[]string{"/bin/bash cleanup.sh"},
+				))
+			})
+			It("should have output artifacts", func() {
+				Expect(build.Output).To(Equal(
+					[]string{"myfile.tgz"},
+				))
+			})
+			It("should have an image", func() {
+				Expect(build.Image).To(Equal("jigs/test"))
+			})
+		})
+
+		It("should not error", func() {
+			Expect(err).NotTo(HaveOccurred())
+		})
+	})
+
+	Describe("Parsing a Jigfile in a directory", func() {
+		var (
+			dirname string
+			err     error
+			jf      *Jigfile
+			build   Build
+		)
+		BeforeEach(func() {
+			data := `
+				{
+					"ubuntu": {
+						"pre": [
+							"/bin/bash dependencies.sh"
+						],
+						"build": [
+							"configure", 
+							"make", 
+							"make install"
+						],
+						"post": [
+							"/bin/bash cleanup.sh"
+						],
+						"output": [
+							"myfile.tgz"
+						],
+						"image": "jigs/test"
+					}
+				}
+				`
+			dirname, _ = ioutil.TempDir("", "jig")
+			fname := filepath.Join(dirname, "Jigfile")
+			ioutil.WriteFile(fname, []byte(data), 0777)
+			jf, err = ParseJigfilePath(dirname)
+		})
+		AfterEach(func() {
+			if dirname != "" {
+				syscall.Unlink(dirname)
+				dirname = ""
 			}
 		})
 		It("should have the build by name", func() {

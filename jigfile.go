@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path/filepath"
+)
+
+const (
+	JIGFILE = "Jigfile"
 )
 
 type Jigfile struct {
@@ -27,14 +32,27 @@ func ParseJigfile(r io.Reader) (*Jigfile, error) {
 	return jf, nil
 }
 
-func ParseJigfileFromFile(p string) (*Jigfile, error) {
+func ParseJigfilePath(p string) (*Jigfile, error) {
 	var (
+		dir *os.File
 		f   io.ReadCloser
 		err error
 	)
-	if f, err = os.Open(p); err != nil {
+	if dir, err = os.Open(p); err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer dir.Close()
+	stat, err := dir.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if stat.IsDir() {
+		if f, err = os.Open(filepath.Join(p, JIGFILE)); err != nil {
+			return nil, err
+		}
+		defer f.Close()
+	} else {
+		f = dir
+	}
 	return ParseJigfile(f)
 }
