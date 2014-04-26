@@ -12,31 +12,28 @@ const (
 )
 
 type Jigfile struct {
-	Builds map[string]Build
-}
-
-type Build struct {
-	Pre    []string
-	Build  []string
-	Post   []string
-	Output []string
-	Image  string
+	Path  string
+	Specs map[string]*JigSpec
 }
 
 func ParseJigfile(r io.Reader) (*Jigfile, error) {
 	jf := &Jigfile{}
 	dec := json.NewDecoder(r)
-	if err := dec.Decode(&jf.Builds); err != nil && err != io.EOF {
+	if err := dec.Decode(&jf.Specs); err != nil && err != io.EOF {
 		return nil, err
+	}
+	for name, spec := range jf.Specs {
+		spec.Name = name
 	}
 	return jf, nil
 }
 
 func ParseJigfilePath(p string) (*Jigfile, error) {
 	var (
-		dir *os.File
-		f   io.ReadCloser
-		err error
+		dir   *os.File
+		f     io.ReadCloser
+		fname string = p
+		err   error
 	)
 	if dir, err = os.Open(p); err != nil {
 		return nil, err
@@ -47,12 +44,18 @@ func ParseJigfilePath(p string) (*Jigfile, error) {
 		return nil, err
 	}
 	if stat.IsDir() {
-		if f, err = os.Open(filepath.Join(p, JIGFILE)); err != nil {
+		fname = filepath.Join(p, JIGFILE)
+		if f, err = os.Open(fname); err != nil {
 			return nil, err
 		}
 		defer f.Close()
 	} else {
 		f = dir
 	}
-	return ParseJigfile(f)
+	jf, err := ParseJigfile(f)
+	if err != nil {
+		return nil, err
+	}
+	jf.Path = fname
+	return jf, nil
 }

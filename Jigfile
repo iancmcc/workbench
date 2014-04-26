@@ -1,0 +1,14 @@
+{
+    "ubuntu": {
+        "pre": [
+            "apt-get -y install golang make"
+        ],
+        "build": [
+            "make build"
+        ],
+        "output": [
+            "jig/jig"
+        ],
+        "image": "ubuntu:trusty"
+    }
+}
