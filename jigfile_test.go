@@ -33,7 +33,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"spec": [
+						"build": [
 							"configure", 
 							"make", 
 							"make install"
@@ -105,7 +105,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"spec": [
+						"build": [
 							"configure", 
 							"make", 
 							"make install"
@@ -183,7 +183,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"spec": [
+						"build": [
 							"configure", 
 							"make", 
 							"make install"
