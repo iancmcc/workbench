@@ -2,21 +2,13 @@ package jig
 
 import (
 	"os"
-	"runtime"
-	"syscall"
-	"unsafe"
+	"path/filepath"
 )
 
-func IsTTY(f *os.File) bool {
-	switch runtime.GOOS {
-	case "darwin":
-	case "linux":
-	default:
-		return false
+func ensureDirectory(path ...string) (string, error) {
+	p := filepath.Join(path...)
+	if err := os.MkdirAll(p, 0775); err != nil {
+		return "", err
 	}
-	var t [2]byte
-	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
-		f.Fd(), syscall.TIOCGPGRP,
-		uintptr(unsafe.Pointer(&t)))
-	return errno == 0
+	return p, nil
 }

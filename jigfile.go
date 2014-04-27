@@ -23,6 +23,7 @@ func ParseJigfile(r io.Reader) (*Jigfile, error) {
 		return nil, err
 	}
 	for name, spec := range jf.Specs {
+		spec.Jigfile = jf
 		spec.Name = name
 	}
 	return jf, nil
@@ -56,6 +57,6 @@ func ParseJigfilePath(p string) (*Jigfile, error) {
 	if err != nil {
 		return nil, err
 	}
-	jf.Path = fname
+	jf.Path = dir.Name()
 	return jf, nil
 }

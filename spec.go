@@ -1,8 +1,9 @@
 package jig
 
 import (
-	"os"
+	"io/ioutil"
 	"path/filepath"
+	"strings"
 )
 
 type JigSpec struct {
@@ -20,9 +21,28 @@ const (
 )
 
 func (spec *JigSpec) ConfigDir() (string, error) {
-	p := filepath.Join(spec.Jigfile.Path, JIGDIR, spec.Name)
-	if err := os.MkdirAll(p, 0664); err != nil {
-		return "", err
+	return ensureDirectory(spec.Jigfile.Path, JIGDIR, spec.Name)
+}
+
+func (spec *JigSpec) CreateScripts() error {
+	cfgdir, err := spec.ConfigDir()
+	if err != nil {
+		return err
 	}
-	return p, nil
+	pre := filepath.Join(cfgdir, "pre")
+	predata := strings.Join(spec.Pre, "\n")
+	if err := ioutil.WriteFile(pre, []byte(predata), 0755); err != nil {
+		return err
+	}
+	build := filepath.Join(cfgdir, "build")
+	builddata := strings.Join(spec.Build, "\n")
+	if err := ioutil.WriteFile(build, []byte(builddata), 0755); err != nil {
+		return err
+	}
+	post := filepath.Join(cfgdir, "post")
+	postdata := strings.Join(spec.Post, "\n")
+	if err := ioutil.WriteFile(post, []byte(postdata), 0755); err != nil {
+		return err
+	}
+	return nil
 }
