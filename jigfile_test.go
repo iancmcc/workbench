@@ -18,13 +18,13 @@ var _ = Describe("Jigfile", func() {
 	Describe("Parsing Jigfile data", func() {
 
 		var (
-			data  string
-			err   error
-			jf    *Jigfile
-			build Build
+			data string
+			err  error
+			jf   *Jigfile
+			spec *JigSpec
 		)
 
-		Context("With one valid build", func() {
+		Context("With one valid spec", func() {
 
 			BeforeEach(func() {
 				data = `
@@ -33,7 +33,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"build": [
+						"spec": [
 							"configure", 
 							"make", 
 							"make install"
@@ -51,36 +51,36 @@ var _ = Describe("Jigfile", func() {
 				jf, err = ParseJigfile(strings.NewReader(data))
 			})
 
-			It("should have the build by name", func() {
-				Expect(jf.Builds).To(HaveKey("ubuntu"))
+			It("should have the spec by name", func() {
+				Expect(jf.Specs).To(HaveKey("ubuntu"))
 			})
 
-			Context("the build", func() {
+			Context("the spec", func() {
 				BeforeEach(func() {
-					build = jf.Builds["ubuntu"]
+					spec = jf.Specs["ubuntu"]
 				})
 				It("should have a pre script", func() {
-					Expect(build.Pre).To(Equal(
+					Expect(spec.Pre).To(Equal(
 						[]string{"/bin/bash dependencies.sh"},
 					))
 				})
-				It("should have build commands", func() {
-					Expect(build.Build).To(Equal(
+				It("should have spec commands", func() {
+					Expect(spec.Build).To(Equal(
 						[]string{"configure", "make", "make install"},
 					))
 				})
 				It("should have post commands", func() {
-					Expect(build.Post).To(Equal(
+					Expect(spec.Post).To(Equal(
 						[]string{"/bin/bash cleanup.sh"},
 					))
 				})
 				It("should have output artifacts", func() {
-					Expect(build.Output).To(Equal(
+					Expect(spec.Output).To(Equal(
 						[]string{"myfile.tgz"},
 					))
 				})
 				It("should have an image", func() {
-					Expect(build.Image).To(Equal("jigs/test"))
+					Expect(spec.Image).To(Equal("jigs/test"))
 				})
 			})
 
@@ -93,10 +93,10 @@ var _ = Describe("Jigfile", func() {
 
 	Describe("Parsing a Jigfile", func() {
 		var (
-			file  *os.File
-			err   error
-			jf    *Jigfile
-			build Build
+			file *os.File
+			err  error
+			jf   *Jigfile
+			spec *JigSpec
 		)
 		BeforeEach(func() {
 			data := `
@@ -105,7 +105,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"build": [
+						"spec": [
 							"configure", 
 							"make", 
 							"make install"
@@ -131,36 +131,36 @@ var _ = Describe("Jigfile", func() {
 				file = nil
 			}
 		})
-		It("should have the build by name", func() {
-			Expect(jf.Builds).To(HaveKey("ubuntu"))
+		It("should have the spec by name", func() {
+			Expect(jf.Specs).To(HaveKey("ubuntu"))
 		})
 
-		Context("the build", func() {
+		Context("the spec", func() {
 			BeforeEach(func() {
-				build = jf.Builds["ubuntu"]
+				spec = jf.Specs["ubuntu"]
 			})
 			It("should have a pre script", func() {
-				Expect(build.Pre).To(Equal(
+				Expect(spec.Pre).To(Equal(
 					[]string{"/bin/bash dependencies.sh"},
 				))
 			})
-			It("should have build commands", func() {
-				Expect(build.Build).To(Equal(
+			It("should have spec commands", func() {
+				Expect(spec.Build).To(Equal(
 					[]string{"configure", "make", "make install"},
 				))
 			})
 			It("should have post commands", func() {
-				Expect(build.Post).To(Equal(
+				Expect(spec.Post).To(Equal(
 					[]string{"/bin/bash cleanup.sh"},
 				))
 			})
 			It("should have output artifacts", func() {
-				Expect(build.Output).To(Equal(
+				Expect(spec.Output).To(Equal(
 					[]string{"myfile.tgz"},
 				))
 			})
 			It("should have an image", func() {
-				Expect(build.Image).To(Equal("jigs/test"))
+				Expect(spec.Image).To(Equal("jigs/test"))
 			})
 		})
 
@@ -174,7 +174,7 @@ var _ = Describe("Jigfile", func() {
 			dirname string
 			err     error
 			jf      *Jigfile
-			build   Build
+			spec    *JigSpec
 		)
 		BeforeEach(func() {
 			data := `
@@ -183,7 +183,7 @@ var _ = Describe("Jigfile", func() {
 						"pre": [
 							"/bin/bash dependencies.sh"
 						],
-						"build": [
+						"spec": [
 							"configure", 
 							"make", 
 							"make install"
@@ -209,36 +209,36 @@ var _ = Describe("Jigfile", func() {
 				dirname = ""
 			}
 		})
-		It("should have the build by name", func() {
-			Expect(jf.Builds).To(HaveKey("ubuntu"))
+		It("should have the spec by name", func() {
+			Expect(jf.Specs).To(HaveKey("ubuntu"))
 		})
 
-		Context("the build", func() {
+		Context("the spec", func() {
 			BeforeEach(func() {
-				build = jf.Builds["ubuntu"]
+				spec = jf.Specs["ubuntu"]
 			})
 			It("should have a pre script", func() {
-				Expect(build.Pre).To(Equal(
+				Expect(spec.Pre).To(Equal(
 					[]string{"/bin/bash dependencies.sh"},
 				))
 			})
-			It("should have build commands", func() {
-				Expect(build.Build).To(Equal(
+			It("should have spec commands", func() {
+				Expect(spec.Build).To(Equal(
 					[]string{"configure", "make", "make install"},
 				))
 			})
 			It("should have post commands", func() {
-				Expect(build.Post).To(Equal(
+				Expect(spec.Post).To(Equal(
 					[]string{"/bin/bash cleanup.sh"},
 				))
 			})
 			It("should have output artifacts", func() {
-				Expect(build.Output).To(Equal(
+				Expect(spec.Output).To(Equal(
 					[]string{"myfile.tgz"},
 				))
 			})
 			It("should have an image", func() {
-				Expect(build.Image).To(Equal("jigs/test"))
+				Expect(spec.Image).To(Equal("jigs/test"))
 			})
 		})
 
