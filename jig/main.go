@@ -47,7 +47,9 @@ func Build(c *cli.Context) {
 func main() {
 	format := logging.MustStringFormatter("[%{level}] %{message}")
 	logBackend := logging.NewLogBackend(os.Stdout, "", stdlog.LstdFlags)
-	logBackend.Color = true
+	if jig.IsTTY(os.Stdout) {
+		logBackend.Color = true
+	}
 	logging.SetFormatter(format)
 	logging.SetBackend(logBackend)
 	logging.SetLevel(logging.DEBUG, "jig")
