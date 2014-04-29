@@ -49,6 +49,7 @@ func execute(jb *JigSpec) error {
 	jb.CreateScripts()
 	containername := fmt.Sprintf("jig-%s", jb.Name)
 	buildcmd := exec.Command("docker", "build", "-t", containername, cfg)
+	// TODO: Enable if verbose
 	//buildcmd.Stdout = os.Stdout
 	buildcmd.Stderr = &stderr
 	if err := buildcmd.Start(); err != nil {
@@ -63,6 +64,7 @@ func execute(jb *JigSpec) error {
 		fmt.Sprintf("%s:%s", rootpath, jb.Mount),
 		containername,
 		"/bin/bash", "/tmp/build")
+	// TODO: Enable if verbose
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = &stderr
 	log.Info("%s: Kicking a build", jb.Name)
@@ -70,9 +72,10 @@ func execute(jb *JigSpec) error {
 		return err
 	}
 	if err := cmd.Wait(); err != nil {
-		err = fmt.Errorf("Error exporting: %s\nStderr: %s",
+		err = fmt.Errorf("Build did not complete successfully: %s\nStderr: %s",
 			err, stderr.String())
 		return err
 	}
+	log.Info("Build complete!")
 	return nil
 }

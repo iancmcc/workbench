@@ -52,7 +52,7 @@ func main() {
 	}
 	logging.SetFormatter(format)
 	logging.SetBackend(logBackend)
-	logging.SetLevel(logging.DEBUG, "jig")
+	logging.SetLevel(logging.INFO, "jig")
 
 	app := cli.NewApp()
 	app.Name = "jig"
