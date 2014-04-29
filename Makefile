@@ -1,6 +1,7 @@
 default: build
 
 build:
+	@cd jig && go get
 	@cd jig && go build
 
 install:

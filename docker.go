@@ -23,8 +23,10 @@ ADD pre /tmp/pre
 ADD build /tmp/build
 ADD post /tmp/post
 RUN /bin/bash /tmp/pre
-WORKDIR /mnt/jig
 USER jig
+WORKDIR {{.Workdir}}
+{{range $k, $v := .Environ}}ENV {{$k}} {{$v}}
+{{end}}
 `
 
 type context struct {
@@ -32,6 +34,8 @@ type context struct {
 	Gid      string
 	Image    string
 	SpecName string
+	Environ  map[string]string
+	Workdir  string
 }
 
 func createContext(spec *JigSpec) (*context, error) {
@@ -45,6 +49,11 @@ func createContext(spec *JigSpec) (*context, error) {
 	c.Uid = u.Uid
 	c.Gid = u.Gid
 	c.SpecName = spec.Name
+	c.Environ = spec.Environ
+	c.Workdir = spec.Workdir
+	if c.Workdir == "" {
+		c.Workdir = spec.Mount
+	}
 	return c, nil
 }
 

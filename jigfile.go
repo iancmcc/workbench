@@ -1,10 +1,12 @@
 package jig
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
 const (
@@ -16,6 +18,17 @@ type Jigfile struct {
 	Specs map[string]*JigSpec
 }
 
+var specContext = map[string]string{
+	"Workbench": "/mnt/jig",
+}
+
+func applySpecContext(s string) string {
+	buffer := &bytes.Buffer{}
+	tpl, _ := template.New("x").Parse(s)
+	tpl.Execute(buffer, specContext)
+	return buffer.String()
+}
+
 func ParseJigfile(r io.Reader) (*Jigfile, error) {
 	jf := &Jigfile{}
 	dec := json.NewDecoder(r)
@@ -25,6 +38,17 @@ func ParseJigfile(r io.Reader) (*Jigfile, error) {
 	for name, spec := range jf.Specs {
 		spec.Jigfile = jf
 		spec.Name = name
+		if spec.Mount == "" {
+			spec.Mount = "{{.Workbench}}"
+		}
+		if spec.Workdir == "" {
+			spec.Workdir = spec.Mount
+		}
+		spec.Workdir = applySpecContext(spec.Workdir)
+		spec.Mount = applySpecContext(spec.Mount)
+		for k, v := range spec.Environ {
+			spec.Environ[applySpecContext(k)] = applySpecContext(v)
+		}
 	}
 	return jf, nil
 }

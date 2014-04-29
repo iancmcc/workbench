@@ -1,7 +1,8 @@
 {
-    "ubuntu": {
+    "linux": {
+        "image": "ubuntu:trusty",
         "pre": [
-            "apt-get -y install golang make"
+            "apt-get -y install golang make git-core"
         ],
         "build": [
             "make build"
@@ -9,6 +10,9 @@
         "output": [
             "jig/jig"
         ],
-        "image": "ubuntu:trusty"
+        "environ": {
+            "GOPATH":"{{.Workbench}}"
+        },
+        "mount": "{{.Workbench}}/src/github.com/iancmcc/jig"
     }
 }

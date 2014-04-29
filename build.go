@@ -60,7 +60,7 @@ func execute(jb *JigSpec) error {
 		return err
 	}
 	cmd := exec.Command("docker", "run", "--rm", "-v",
-		fmt.Sprintf("%s:/mnt/jig", rootpath),
+		fmt.Sprintf("%s:%s", rootpath, jb.Mount),
 		containername,
 		"/bin/bash", "/tmp/build")
 	cmd.Stdout = os.Stdout
