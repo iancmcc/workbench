@@ -21,7 +21,7 @@ func Build(jf *Jigfile) {
 		filepath.Join(jf.Path, "Jigfile"))
 	for _, spec := range jf.Specs {
 		wg.Add(1)
-		log = logging.MustGetLogger(spec.Name)
+		//log = logging.MustGetLogger(spec.Name)
 		log.Info(`Executing spec "%s"`, spec.Name)
 		go func() {
 			defer wg.Done()

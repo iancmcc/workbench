@@ -23,15 +23,18 @@ const banner string = `      _ _
 
 `
 
-func Build(c *cli.Context) {
+func Build(ctx *cli.Context) {
 	var (
 		jf  *jig.Jigfile
 		err error
 		pwd string
 	)
-	fmt.Printf(banner, version)
+	if !ctx.GlobalBool("quiet") {
+		fmt.Printf(banner, version)
+		fmt.Println("Running builds...")
+	}
 	if pwd, err = os.Getwd(); err != nil {
-		log.Critical("Unable to do something")
+		log.Critical("Unable to get current directory")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -44,7 +47,7 @@ func Build(c *cli.Context) {
 	jig.Build(jf)
 }
 
-func main() {
+func jigInit(ctx *cli.Context) error {
 	format := logging.MustStringFormatter("[%{level}] %{message}")
 	logBackend := logging.NewLogBackend(os.Stdout, "", stdlog.LstdFlags)
 	if isTTY(os.Stdout) {
@@ -52,17 +55,27 @@ func main() {
 	}
 	logging.SetFormatter(format)
 	logging.SetBackend(logBackend)
-	logging.SetLevel(logging.INFO, "jig")
+	logging.SetLevel(logging.Level(ctx.GlobalInt("level")), "jig")
+	return nil
+}
 
+func main() {
 	app := cli.NewApp()
 	app.Name = "jig"
 	app.Usage = "Portable build system"
-	app.Commands = []cli.Command{
-		{
-			Name:   "build",
-			Usage:  "Build artifacts from a Jigfile",
-			Action: Build,
-		},
+	app.Before = jigInit
+	app.Flags = []cli.Flag{
+		cli.IntFlag{"level, l", 4, "log level (5 for debug, 0 for silent)"},
+		cli.BoolFlag{"quiet, q", "don't display banner or messages"},
 	}
+	build := cli.Command{
+		Name:   "build",
+		Usage:  "Build artifacts from a Jigfile",
+		Action: Build,
+	}
+	build.Flags = []cli.Flag{
+		cli.StringFlag{"output, o", "./output", "output directory for artifacts"},
+	}
+	app.Commands = []cli.Command{build}
 	app.Run(os.Args)
 }
