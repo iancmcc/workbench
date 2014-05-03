@@ -14,13 +14,26 @@ var (
 	log = logging.MustGetLogger("jig")
 )
 
-func Build(jf *Jigfile) {
+func Build(jf *Jigfile, builds []string) {
 	log.Debug("Attempting to build using Jigfile %s",
 		filepath.Join(jf.Path, "Jigfile"))
-	for _, spec := range jf.Specs {
+	execute := func(spec *JigSpec) {
 		log.Info(`Executing spec "%s"`, spec.Name)
 		if err := execute(spec); err != nil {
 			log.Critical("%v", err)
+		}
+	}
+	if len(builds) > 0 {
+		for _, n := range builds {
+			if spec, ok := jf.Specs[n]; ok {
+				execute(spec)
+			} else {
+				log.Error("Build spec %s doesn't exist", n)
+			}
+		}
+	} else {
+		for _, spec := range jf.Specs {
+			execute(spec)
 		}
 	}
 }

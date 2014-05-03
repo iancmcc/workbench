@@ -12,7 +12,7 @@ import (
 
 var (
 	log     = logging.MustGetLogger("jig")
-	version = "0.0.1"
+	version = "0.1.0"
 )
 
 const banner string = `      _ _
@@ -44,7 +44,7 @@ func Build(ctx *cli.Context) {
 		log.Debug(fmt.Sprintf("%v", err))
 		os.Exit(1)
 	}
-	jig.Build(jf)
+	jig.Build(jf, ctx.Args())
 }
 
 func Initialize(ctx *cli.Context) {
