@@ -12,13 +12,12 @@ type JigSpec struct {
 	Pre     []string
 	Build   []string
 	Post    []string
-	Output  []string
 	Image   string
 	Name    string
 	Workdir string
 	Environ map[string]string
 	Mount   string
-	Jigfile *Jigfile
+	Jigfile *Jigfile `json:"-"`
 }
 
 const (

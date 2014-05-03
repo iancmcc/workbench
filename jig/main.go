@@ -47,6 +47,30 @@ func Build(ctx *cli.Context) {
 	jig.Build(jf)
 }
 
+func Initialize(ctx *cli.Context) {
+	var (
+		pwd, name string
+		err       error
+	)
+	args := ctx.Args()
+	if args.Present() {
+		name = args.First()
+	} else {
+		name = "build"
+	}
+	if pwd, err = os.Getwd(); err != nil {
+		log.Critical("Unable to get current directory: %+v", err)
+		os.Exit(1)
+	}
+	if err := jig.Initialize(pwd, name, ctx.String("image"),
+		ctx.StringSlice("pre"),
+		ctx.StringSlice("build"),
+		ctx.StringSlice("post")); err != nil {
+		log.Error("Initialization of Jigfile failed: %+v", err)
+		os.Exit(1)
+	}
+}
+
 func jigInit(ctx *cli.Context) error {
 	format := logging.MustStringFormatter("[%{level}] %{message}")
 	logBackend := logging.NewLogBackend(os.Stdout, "", stdlog.LstdFlags)
@@ -73,9 +97,35 @@ func main() {
 		Usage:  "Build artifacts from a Jigfile",
 		Action: Build,
 	}
-	build.Flags = []cli.Flag{
-		cli.StringFlag{"output, o", "./output", "output directory for artifacts"},
+	initialize := cli.Command{
+		Name:   "init",
+		Usage:  "Initialize a Jigfile in the current directory",
+		Action: Initialize,
 	}
-	app.Commands = []cli.Command{build}
+	initialize.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "image, i",
+			Value: "jigs/build",
+			Usage: "Base image to use for the build",
+		},
+		cli.StringSliceFlag{
+			Name:  "pre",
+			Value: &cli.StringSlice{},
+			Usage: "Commands to be executed as root before the build",
+		},
+		cli.StringSliceFlag{
+			Name:  "build, b",
+			Value: &cli.StringSlice{},
+			Usage: "Build commands to be executed",
+		},
+		cli.StringSliceFlag{
+			Name:  "post",
+			Value: &cli.StringSlice{},
+			Usage: "Commands to be executed as root after the build",
+		},
+	}
+	build.Flags = []cli.Flag{}
+	app.Commands = []cli.Command{build, initialize}
+	app.Version = version
 	app.Run(os.Args)
 }

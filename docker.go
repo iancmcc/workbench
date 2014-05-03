@@ -10,7 +10,7 @@ import (
 
 const dftemplate string = `
 FROM {{.Image}}
-MAINTAINER jig <jig@jig.io>
+MAINTAINER github.com/iancmcc/jig
 
 RUN groupadd -f -g {{.Gid}} jig
 RUN useradd -d /home/jig -m \

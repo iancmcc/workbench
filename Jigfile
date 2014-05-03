@@ -1,8 +1,8 @@
 {
     "linux": {
-        "image": "ubuntu:trusty",
+        "image": "jigs/fpm",
         "pre": [
-            "apt-get -y install golang make git-core"
+            "apt-get -y install golang git-core"
         ],
         "build": [
             "make build"

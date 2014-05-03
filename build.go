@@ -47,7 +47,7 @@ func execute(jb *JigSpec) error {
 	}
 	log.Info("%s: Building the base container", jb.Name)
 	jb.CreateScripts()
-	containername := fmt.Sprintf("jig-%s", jb.Name)
+	containername := randstring(12)
 	buildcmd := exec.Command("docker", "build", "-t", containername, cfg)
 	// TODO: Enable if verbose
 	//buildcmd.Stdout = os.Stdout
@@ -63,7 +63,7 @@ func execute(jb *JigSpec) error {
 	cmd := exec.Command("docker", "run", "--rm", "-v",
 		fmt.Sprintf("%s:%s", rootpath, jb.Mount),
 		containername,
-		"/bin/bash", "/tmp/build")
+		"/bin/bash", "-c", "sudo /bin/bash /tmp/pre && /bin/bash /tmp/build && sudo /bin/bash /tmp/post")
 	// TODO: Enable if verbose
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = &stderr

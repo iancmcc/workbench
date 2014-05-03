@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	JIGFILE = "Jigfile"
+	JIGFILE   = "Jigfile"
+	WORKBENCH = "{{.Workbench}}"
 )
 
 type Jigfile struct {
