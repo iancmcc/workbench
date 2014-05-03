@@ -12,7 +12,7 @@ import (
 
 var (
 	log     = logging.MustGetLogger("jig")
-	version = "0.1.0"
+	VERSION = "0.1.0"
 )
 
 const banner string = `      _ _
@@ -30,7 +30,7 @@ func Build(ctx *cli.Context) {
 		pwd string
 	)
 	if !ctx.GlobalBool("quiet") {
-		fmt.Printf(banner, version)
+		fmt.Printf(banner, VERSION)
 		fmt.Println("Running builds...")
 	}
 	if pwd, err = os.Getwd(); err != nil {
@@ -105,7 +105,7 @@ func main() {
 	initialize.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "image, i",
-			Value: "jigs/build",
+			Value: "jigs/base",
 			Usage: "Base image to use for the build",
 		},
 		cli.StringSliceFlag{
@@ -126,6 +126,6 @@ func main() {
 	}
 	build.Flags = []cli.Flag{}
 	app.Commands = []cli.Command{build, initialize}
-	app.Version = version
+	app.Version = VERSION
 	app.Run(os.Args)
 }

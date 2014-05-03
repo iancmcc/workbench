@@ -2,7 +2,7 @@
     "deb": {
         "image": "jigs/fpm",
         "pre": [
-            "apt-get -y install golang git-core"
+            "apt-get -yqq install golang"
         ],
         "build": [
             "make deb"
@@ -15,7 +15,7 @@
     "rpm": {
         "image": "jigs/fpm",
         "pre": [
-            "apt-get -y install golang git-core"
+            "apt-get -yqq install golang"
         ],
         "build": [
             "make rpm"
