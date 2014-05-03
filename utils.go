@@ -19,7 +19,7 @@ func ensureDirectory(path ...string) (string, error) {
 func randstring(length int) string {
 	b := make([]byte, length)
 	rand.Read(b)
-	en := base64.StdEncoding
+	en := base64.URLEncoding
 	d := make([]byte, en.EncodedLen(len(b)))
 	en.Encode(d, b)
 	return strings.ToLower(string(d))

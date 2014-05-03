@@ -24,3 +24,7 @@ _testmain.go
 
 .jig
 jig/jig
+
+pkgroot
+*.rpm
+*.deb

@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sync"
 
 	"github.com/op/go-logging"
 )
@@ -16,21 +15,14 @@ var (
 )
 
 func Build(jf *Jigfile) {
-	var wg sync.WaitGroup
 	log.Debug("Attempting to build using Jigfile %s",
 		filepath.Join(jf.Path, "Jigfile"))
 	for _, spec := range jf.Specs {
-		wg.Add(1)
-		//log = logging.MustGetLogger(spec.Name)
 		log.Info(`Executing spec "%s"`, spec.Name)
-		go func() {
-			defer wg.Done()
-			if err := execute(spec); err != nil {
-				log.Critical("%v", err)
-			}
-		}()
+		if err := execute(spec); err != nil {
+			log.Critical("%v", err)
+		}
 	}
-	wg.Wait()
 }
 
 func execute(jb *JigSpec) error {

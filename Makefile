@@ -14,3 +14,15 @@ test:
 clean:
 	@go clean
 	@cd jig && go clean
+	@rm -rf pkgroot
+
+stage: build
+	@mkdir -p pkgroot/usr/bin
+	@cp jig/jig pkgroot/usr/bin/jig
+
+deb: stage
+	@fpm -C pkgroot -s dir -v $$(cat VERSION) -n jig -t deb usr
+
+rpm: stage
+	@fpm -C pkgroot -s dir -v $$(cat VERSION) -n jig -t rpm usr
+
